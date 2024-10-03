@@ -9,30 +9,25 @@ import UIKit
 
 class ViewController: UIViewController {
     private let dataSource = ["Apple", "Mango", "Orange", "Banana", "Kiwi", "Watermelon"]
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         
-        let button = UIButton(primaryAction: nil)
-
-        let actionClosure = { (action: UIAction) in
-            print(action.title)
-        }
-
-        var menuChildren: [UIMenuElement] = []
-        for fruit in dataSource {
-            menuChildren.append(UIAction(title: fruit, handler: actionClosure))
-        }
-        
-        button.menu = UIMenu(options: .displayInline, children: menuChildren)
-        
-        button.showsMenuAsPrimaryAction = true
-        button.changesSelectionAsPrimaryAction = true
-        
-        button.frame = CGRect(x: 150, y: 200, width: 100, height: 40)
-        self.view.addSubview(button)
+        view.addSubview(dropDown)
+        NSLayoutConstraint.activate([
+            dropDown.topAnchor.constraint(equalTo: view.topAnchor, constant: 100),
+            dropDown.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 100),
+            dropDown.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -100),
+            dropDown.heightAnchor.constraint(equalToConstant: 42)
+        ])
     }
-
-
+    
+    let dropDown: DropDownMenu = {
+        let dropDown = DropDownMenu()
+        dropDown.text = "Hello"
+        dropDown.translatesAutoresizingMaskIntoConstraints = false
+        return dropDown
+    }()
 }
 
