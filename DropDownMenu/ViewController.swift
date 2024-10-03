@@ -21,6 +21,7 @@ class ViewController: UIViewController {
             dropDown.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -100),
             dropDown.heightAnchor.constraint(equalToConstant: 42)
         ])
+        dropDown.optionArray = dataSource
     }
     
     let dropDown: DropDownMenu = {
