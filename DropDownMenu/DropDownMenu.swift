@@ -17,6 +17,7 @@ class DropDownMenu: UITextField {
             dataArray = optionArray
         }
     }
+    public var selectedIndex: Int?
     // MARK: - Private Variables
     fileprivate weak var parentController: UIViewController?
     fileprivate var pointToParent = CGPoint(x: 0, y: 0)
@@ -137,7 +138,7 @@ class DropDownMenu: UITextField {
         tableView.alpha = 0
         tableView.separatorStyle = .none
         tableView.layer.cornerRadius = 8
-        tableView.backgroundColor = .clear
+        tableView.backgroundColor = .white
         tableView.layer.masksToBounds = true
         tableView.layer.borderWidth = 1
         tableView.layer.borderColor = UIColor.lightGray.cgColor
@@ -189,7 +190,7 @@ class DropDownMenu: UITextField {
     }()
 }
 
-extension DropDownMenu: UITableViewDataSource, UITableViewDelegate {
+extension DropDownMenu: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return dataArray.count
     }
@@ -203,17 +204,14 @@ extension DropDownMenu: UITableViewDataSource, UITableViewDelegate {
             cell = UITableViewCell(style: .default, reuseIdentifier: cellIdentifier)
         }
         
-//        if indexPath.row != selectedIndex {
-//            cell!.backgroundColor = rowBackgroundColor
-//        } else {
-//            cell?.backgroundColor = selectedRowColor
-//        }
+        if indexPath.row != selectedIndex {
+            cell!.backgroundColor = .white
+        } else {
+            cell?.backgroundColor = .blue
+        }
         
-//        if imageArray.count > indexPath.row {
-//            cell!.imageView!.image = UIImage(named: imageArray[indexPath.row])
-//        }
         cell!.textLabel!.text = "\(dataArray[indexPath.row])"
-        cell!.textLabel!.textColor = .red
+        cell!.textLabel!.textColor = .black
         cell!.tintColor = .blue
         
         cell!.selectionStyle = .none
@@ -225,27 +223,26 @@ extension DropDownMenu: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
+extension DropDownMenu: UITableViewDelegate {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        let currentIndex = (indexPath as NSIndexPath).row
+        let selectedText = dataArray[currentIndex]
+        
+        tableView.cellForRow(at: indexPath)?.alpha = 0
+        UIView.animate(withDuration: 0.5,
+                       animations: { () -> Void in
+            tableView.cellForRow(at: indexPath)?.alpha = 1.0
+            tableView.cellForRow(at: indexPath)?.backgroundColor = .brown
+        },
+                       completion: { (_) -> Void in
+            self.text = "\(selectedText)"
+            self.touchAction()
+        })
+    }
+}
+
 extension UIView {
-    func dropShadow(scale: Bool = true) {
-        layer.masksToBounds = false
-        layer.shadowColor = UIColor.black.cgColor
-        layer.shadowOpacity = 0.5
-        layer.shadowOffset = CGSize(width: 1, height: 1)
-        layer.shadowRadius = 2
-        layer.shadowPath = UIBezierPath(rect: bounds).cgPath
-        layer.shouldRasterize = true
-        layer.rasterizationScale = scale ? UIScreen.main.scale : 1
-    }
-    
-    func viewBorder(borderColor: UIColor, borderWidth: CGFloat?) {
-        layer.borderColor = borderColor.cgColor
-        if let borderWidth_ = borderWidth {
-            layer.borderWidth = borderWidth_
-        } else {
-            layer.borderWidth = 1.0
-        }
-    }
-    
     var parentViewController: UIViewController? {
         var parentResponder: UIResponder? = self
         while parentResponder != nil {
