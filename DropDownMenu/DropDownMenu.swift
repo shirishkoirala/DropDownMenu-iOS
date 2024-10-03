@@ -12,12 +12,15 @@ class DropDownMenu: UITextField {
     public var arrowSize: CGFloat = 15
     public var rowHeight: CGFloat = 56
     public var listHeight: CGFloat = 150
+    
     public var optionArray = [String]() {
         didSet {
             dataArray = optionArray
         }
     }
     public var selectedIndex: Int?
+    var selectedBackgroundColor = UIColor.gray
+    
     // MARK: - Private Variables
     fileprivate weak var parentController: UIViewController?
     fileprivate var pointToParent = CGPoint(x: 0, y: 0)
@@ -54,6 +57,7 @@ class DropDownMenu: UITextField {
         let size = frame.height
         let arrowView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: size, height: size))
         let arrowContainerView = UIView(frame: arrowView.frame)
+        
         rightView = arrowView
         rightViewMode = .always
         
@@ -76,24 +80,24 @@ class DropDownMenu: UITextField {
                        options: .curveEaseInOut,
                        animations: { () -> Void in
             self.tableView.frame = CGRect(x: self.pointToParent.x,
-                                      y: self.pointToParent.y + self.frame.height,
-                                      width: self.frame.width,
-                                      height: 0)
+                                          y: self.pointToParent.y + self.frame.height,
+                                          width: self.frame.width,
+                                          height: 0)
         },
                        completion: { (_) -> Void in
             self.tableView.removeFromSuperview()
             self.backgroundView.removeFromSuperview()
         })
     }
-
+    
     override open func textRect(forBounds bounds: CGRect) -> CGRect {
         return bounds.inset(by: insets)
     }
-
+    
     override open func placeholderRect(forBounds bounds: CGRect) -> CGRect {
         return bounds.inset(by: insets)
     }
-
+    
     override open func editingRect(forBounds bounds: CGRect) -> CGRect {
         return bounds.inset(by: insets)
     }
@@ -129,9 +133,9 @@ class DropDownMenu: UITextField {
             tableheightX = listHeight
         }
         tableView = UITableView(frame: CGRect(x: pointToParent.x,
-                                          y: pointToParent.y + frame.height,
-                                          width: frame.width,
-                                          height: frame.height))
+                                              y: pointToParent.y + frame.height,
+                                              width: frame.width,
+                                              height: frame.height))
         
         tableView.dataSource = self
         tableView.delegate = self
@@ -152,21 +156,12 @@ class DropDownMenu: UITextField {
         if height < (keyboardHeight + tableheightX) {
             y = pointToParent.y - tableheightX
         }
-        UIView.animate(withDuration: 0.2,
-                       delay: 0,
-                       options: .curveEaseInOut,
-                       animations: { () -> Void in
-            
-            self.tableView.frame = CGRect(x: self.pointToParent.x,
-                                      y: y,
-                                      width: self.frame.width,
-                                      height: self.tableheightX)
+        UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut, animations: { () -> Void in
+            self.tableView.frame = CGRect(x: self.pointToParent.x, y: y, width: self.frame.width, height: self.tableheightX)
             self.tableView.alpha = 1
-            
-        },
-                       completion: { (_) -> Void in
+        }, completion: { (_) -> Void in
             self.layoutIfNeeded()
-            
+            self.tableView.flashScrollIndicators()
         })
     }
     
@@ -179,6 +174,7 @@ class DropDownMenu: UITextField {
         tableView.alpha = 0
         tableView.separatorStyle = .none
         tableView.layer.cornerRadius = 8
+        tableView.showsVerticalScrollIndicator = true
         return tableView
     }()
     
@@ -207,7 +203,7 @@ extension DropDownMenu: UITableViewDataSource {
         if indexPath.row != selectedIndex {
             cell!.backgroundColor = .white
         } else {
-            cell?.backgroundColor = .blue
+            cell?.backgroundColor = selectedBackgroundColor
         }
         
         cell!.textLabel!.text = "\(dataArray[indexPath.row])"
@@ -225,17 +221,15 @@ extension DropDownMenu: UITableViewDataSource {
 
 extension DropDownMenu: UITableViewDelegate {
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
         let currentIndex = (indexPath as NSIndexPath).row
         let selectedText = dataArray[currentIndex]
-        
+        selectedIndex = currentIndex
         tableView.cellForRow(at: indexPath)?.alpha = 0
-        UIView.animate(withDuration: 0.5,
-                       animations: { () -> Void in
+        self.tableView.reloadData()
+        UIView.animate(withDuration: 0.5, animations: { () -> Void in
             tableView.cellForRow(at: indexPath)?.alpha = 1.0
-            tableView.cellForRow(at: indexPath)?.backgroundColor = .brown
-        },
-                       completion: { (_) -> Void in
+            tableView.cellForRow(at: indexPath)?.backgroundColor = self.selectedBackgroundColor
+        }, completion: { (_) -> Void in
             self.text = "\(selectedText)"
             self.touchAction()
         })

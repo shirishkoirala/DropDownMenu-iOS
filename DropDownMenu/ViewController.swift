@@ -17,10 +17,11 @@ class ViewController: UIViewController {
         view.addSubview(dropDown)
         NSLayoutConstraint.activate([
             dropDown.topAnchor.constraint(equalTo: view.topAnchor, constant: 100),
-            dropDown.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 100),
-            dropDown.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -100),
+            dropDown.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 150),
+            dropDown.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -150),
             dropDown.heightAnchor.constraint(equalToConstant: 42)
         ])
+        
         dropDown.optionArray = dataSource
         
         view.addSubview(textVew)
