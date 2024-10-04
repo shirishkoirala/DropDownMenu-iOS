@@ -31,6 +31,7 @@ class DropDownMenu: UITextField {
     private let padding = 20.0
     private var insets = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
     
+    private var arrow: UIImageView?
     
     // MARK: - System Methods
     override public init(frame: CGRect) {
@@ -63,10 +64,10 @@ class DropDownMenu: UITextField {
         
         rightView?.addSubview(arrowContainerView)
         
-        let arrow = UIImageView(frame: CGRect(x: (center.x - arrowSize / 2) - padding, y: center.y - arrowSize / 2, width: arrowSize, height: arrowSize))
-        arrow.image = UIImage(systemName: "chevron.down")
-        arrow.contentMode = .scaleAspectFit
-        arrowContainerView.addSubview(arrow)
+        arrow = UIImageView(frame: CGRect(x: (center.x - arrowSize / 2) - padding, y: center.y - arrowSize / 2, width: arrowSize, height: arrowSize))
+        arrow?.image = UIImage(systemName: "chevron.down")
+        arrow?.contentMode = .scaleAspectFit
+        arrowContainerView.addSubview(arrow!)
     }
     
     @objc public func touchAction() {
@@ -75,7 +76,16 @@ class DropDownMenu: UITextField {
     }
     
     public func hideList() {
-        UIView.animate(withDuration: 0.2, delay: 0.0,options: .curveEaseInOut, animations: { () -> Void in
+        let rotation : CABasicAnimation = CABasicAnimation(keyPath: "transform.rotation.z")
+        rotation.fromValue = NSNumber(value: Double.pi)
+        rotation.toValue = NSNumber(value: 0)
+        rotation.duration = 0.5
+        rotation.repeatCount = 1
+        rotation.fillMode = .forwards
+        rotation.isRemovedOnCompletion = false
+        arrow?.layer.add(rotation, forKey: "rotationAnimation")
+
+        UIView.animate(withDuration: 0.2, delay: 0.0, options: .curveEaseInOut, animations: { () -> Void in
             self.tableView.frame = CGRect(x: self.pointToParent.x, y: self.pointToParent.y + self.frame.height, width: self.frame.width, height: 0)
         }, completion: { (_) -> Void in
             self.tableView.removeFromSuperview()
@@ -127,10 +137,8 @@ class DropDownMenu: UITextField {
         } else {
             tableheightX = listHeight
         }
-        tableView = UITableView(frame: CGRect(x: pointToParent.x,
-                                              y: pointToParent.y + frame.height,
-                                              width: frame.width,
-                                              height: frame.height))
+        
+        tableView = UITableView(frame: CGRect(x: pointToParent.x, y: pointToParent.y + frame.height, width: frame.width, height: frame.height))
         
         tableView.dataSource = self
         tableView.delegate = self
@@ -145,7 +153,13 @@ class DropDownMenu: UITextField {
         tableView.rowHeight = rowHeight
         
         parentController?.view.addSubview(tableView)
-        
+        let rotation : CABasicAnimation = CABasicAnimation(keyPath: "transform.rotation.z")
+        rotation.toValue = NSNumber(value: Double.pi)
+        rotation.duration = 0.5
+        rotation.repeatCount = 1
+        rotation.fillMode = .forwards
+        rotation.isRemovedOnCompletion = false
+        arrow?.layer.add(rotation, forKey: "rotationAnimation")
         isSelected = true
         let height = (parentController?.view.frame.height ?? 0) - (pointToParent.y + frame.height + 5)
         var y = pointToParent.y + frame.height + 5
