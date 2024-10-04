@@ -75,16 +75,9 @@ class DropDownMenu: UITextField {
     }
     
     public func hideList() {
-        UIView.animate(withDuration: 0.2,
-                       delay: 0.2,
-                       options: .curveEaseInOut,
-                       animations: { () -> Void in
-            self.tableView.frame = CGRect(x: self.pointToParent.x,
-                                          y: self.pointToParent.y + self.frame.height,
-                                          width: self.frame.width,
-                                          height: 0)
-        },
-                       completion: { (_) -> Void in
+        UIView.animate(withDuration: 0.2, delay: 0.0,options: .curveEaseInOut, animations: { () -> Void in
+            self.tableView.frame = CGRect(x: self.pointToParent.x, y: self.pointToParent.y + self.frame.height, width: self.frame.width, height: 0)
+        }, completion: { (_) -> Void in
             self.tableView.removeFromSuperview()
             self.backgroundView.removeFromSuperview()
         })
@@ -123,8 +116,10 @@ class DropDownMenu: UITextField {
         if parentController == nil {
             parentController = parentViewController
         }
+        
         backgroundView.frame = parentController?.view.frame ?? backgroundView.frame
         pointToParent = getConvertedPoint(self, baseView: parentController?.view)
+        
         parentController?.view.insertSubview(backgroundView, aboveSubview: self)
         
         if listHeight > rowHeight * CGFloat(dataArray.count) {
@@ -150,6 +145,7 @@ class DropDownMenu: UITextField {
         tableView.rowHeight = rowHeight
         
         parentController?.view.addSubview(tableView)
+        
         isSelected = true
         let height = (parentController?.view.frame.height ?? 0) - (pointToParent.y + frame.height + 5)
         var y = pointToParent.y + frame.height + 5
@@ -162,6 +158,9 @@ class DropDownMenu: UITextField {
         }, completion: { (_) -> Void in
             self.layoutIfNeeded()
             self.tableView.flashScrollIndicators()
+            if let selectedIndex = self.selectedIndex {
+                self.tableView.scrollToRow(at: IndexPath(row: selectedIndex, section: 0), at: .middle, animated: true)
+            }
         })
     }
     
@@ -208,7 +207,6 @@ extension DropDownMenu: UITableViewDataSource {
         
         cell!.textLabel!.text = "\(dataArray[indexPath.row])"
         cell!.textLabel!.textColor = .black
-        cell!.tintColor = .blue
         
         cell!.selectionStyle = .none
         cell?.textLabel?.font = font
@@ -225,10 +223,11 @@ extension DropDownMenu: UITableViewDelegate {
         let selectedText = dataArray[currentIndex]
         selectedIndex = currentIndex
         tableView.cellForRow(at: indexPath)?.alpha = 0
-        self.tableView.reloadData()
+        
         UIView.animate(withDuration: 0.5, animations: { () -> Void in
             tableView.cellForRow(at: indexPath)?.alpha = 1.0
             tableView.cellForRow(at: indexPath)?.backgroundColor = self.selectedBackgroundColor
+            self.tableView.reloadData()
         }, completion: { (_) -> Void in
             self.text = "\(selectedText)"
             self.touchAction()
